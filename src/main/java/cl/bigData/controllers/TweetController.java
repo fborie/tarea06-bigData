@@ -1,10 +1,12 @@
 package cl.bigData.controllers;
 
 import cl.bigData.Entities.Tweet;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import cl.bigData.repositories.TweetRepository;
 
 /**
  * Created by fjborie on 17-06-15.
@@ -13,6 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/")
 @RestController
 public class TweetController {
+
+    @Autowired
+    private TweetRepository tweetRepository;
 
     @RequestMapping(value="tweets", params = "q", method = RequestMethod.GET)
     public Iterable<Tweet> getTweetsByWord(@RequestParam("q") String word){
@@ -28,7 +33,7 @@ public class TweetController {
 
     @RequestMapping(value="user", params = "q", method = RequestMethod.GET)
     public Iterable<Tweet> getTweetsByUser(@RequestParam("q") String user){
-        System.out.println("getTweetsByUser: "+user);
+        tweetRepository.findByUser(user);
         return null;
     }
 
