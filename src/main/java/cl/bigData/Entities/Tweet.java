@@ -26,11 +26,11 @@ public class Tweet {
     private String createdAt;
 
     @JsonProperty
-    private String[] location;
+    private Double[] location;
 
     @JsonCreator
     public Tweet(@JsonProperty("text") String text, @JsonProperty("hashtags") ArrayList<String> hashTags, @JsonProperty("links") ArrayList<String> links,
-                 @JsonProperty("user") String username, @JsonProperty("created_at") String createdAt, @JsonProperty("location") String[] location){
+                 @JsonProperty("user") String username, @JsonProperty("created_at") String createdAt, @JsonProperty("location") Double[] location){
         this.text = text;
         this.hashTags = hashTags;
         this.links = links;

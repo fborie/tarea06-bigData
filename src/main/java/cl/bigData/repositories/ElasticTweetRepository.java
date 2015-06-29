@@ -1,8 +1,25 @@
 package cl.bigData.repositories;
 
 import cl.bigData.Entities.Tweet;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.search.SearchType;
+import org.elasticsearch.client.Client;
+import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.node.NodeBuilder;
+import org.elasticsearch.search.SearchHit;
 import org.springframework.stereotype.Repository;
-import org.springframework.stereotype.Service;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import javax.management.Query;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.elasticsearch.index.query.FilterBuilders.*;
+import static org.elasticsearch.index.query.QueryBuilders.*;
+
 
 /**
  * Created by fjborie on 24-06-15.
@@ -11,29 +28,106 @@ import org.springframework.stereotype.Service;
 @Repository
 public class ElasticTweetRepository implements TweetRepository {
 
+    private static final String INDEX = "twitter2"; //me genera problemas con los fields nesteds en "tweet"
+    private static final String TYPE = "tweet";
+
+
+    private Client client;
+
+    @PostConstruct
+    public void setup(){
+        client = NodeBuilder.nodeBuilder().node().client();
+    }
+
+    @PreDestroy
+    public void tearDown(){
+        client.close();
+    }
+
     @Override
     public Iterable<Tweet> findByUser(String user) {
-        System.out.println("Se encontro al USUARIO!");
-        return null;
+        ArrayList<Tweet> tweets = new ArrayList<Tweet>();
+        QueryBuilder qb = termQuery("user", user);
+
+        //NO SE PORQUE NO FUNCIONA LA BUSQUEDA CON SCROLL
+       /* SearchResponse scrollResp = client.prepareSearch(INDEX).setTypes(TYPE).addField("user").setSearchType(SearchType.SCAN)
+                .setScroll(new TimeValue(60000)).setQuery(qb).setSize(50).execute().actionGet();
+        System.out.println(user);
+        System.out.println(scrollResp.getHits().getHits().length);
+        for (SearchHit hit : scrollResp.getHits().getHits()) {
+            tweets.add(extractTweetFromHit(hit));
+        }*/
+        SearchResponse response = getSearchResponse(qb);
+        System.out.println(response.getHits().getHits().length);
+
+        return extractTweetsFromHits(response.getHits().getHits());
     }
 
     @Override
     public Iterable<Tweet> findByWordInText(String word) {
-        return null;
+        QueryBuilder qb = matchQuery("text", word);
+        SearchResponse response = getSearchResponse(qb);
+        System.out.println(response.getHits().getHits().length);
+
+        return extractTweetsFromHits(response.getHits().getHits());
     }
 
     @Override
     public Iterable<Tweet> findByHashTag(String hashTag) {
-        return null;
+        QueryBuilder qb = matchQuery("hashtags",hashTag);
+        SearchResponse response = getSearchResponse(qb);
+        return extractTweetsFromHits(response.getHits().getHits());
     }
+
 
     @Override
     public Iterable<Tweet> findByLink(String link) {
-        return null;
+        QueryBuilder qb = matchQuery("links",link);
+        SearchResponse response = getSearchResponse(qb);
+        return extractTweetsFromHits(response.getHits().getHits());
     }
 
     @Override
     public Iterable<Tweet> findByLocation(float lat, float lon, float radius) {
         return null;
+    }
+
+    private SearchResponse getSearchResponse(QueryBuilder qb){
+        return client.prepareSearch(INDEX).setTypes(TYPE)
+                .addFields("user", "text", "links", "location", "created_at", "hashtags")
+                .setQuery(qb).setSize(50).execute().actionGet();
+    }
+
+    private ArrayList<Tweet> extractTweetsFromHits(SearchHit[] hits){
+        ArrayList<Tweet> tweets = new ArrayList<Tweet>();
+        for(SearchHit hit: hits){
+            tweets.add(extractTweetFromHit(hit));
+        }
+        return tweets;
+    }
+
+    private Tweet extractTweetFromHit(SearchHit hit){
+        String user = hit.field("user").getValue();
+        String text = hit.field("text").getValue();
+        String createdAt = hit.field("created_at").getValue();
+        ArrayList<String> links = extractListFromField(hit.field("links").getValues());
+        ArrayList<String> hashTags = extractListFromField(hit.field("hashtags").getValues());
+        Double[] location = extractLocation(hit.field("location").getValues());
+        return new Tweet(text,hashTags,links,user,createdAt,location);
+    }
+
+    private ArrayList<String> extractListFromField(List<Object> objects){
+        ArrayList<String> arr = new ArrayList<String>();
+        for (Object obj : objects){
+            arr.add((String) obj);
+        }
+        return arr;
+    }
+
+    private Double[] extractLocation(List<Object> location){
+        Double[] loc = new Double[2];
+        loc[0] =(Double) location.get(0);
+        loc[1] = (Double) location.get(1);
+        return loc;
     }
 }

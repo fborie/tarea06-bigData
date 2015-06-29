@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import cl.bigData.repositories.TweetRepository;
 
+import java.util.ArrayList;
+
 /**
  * Created by fjborie on 17-06-15.
  */
@@ -21,20 +23,22 @@ public class TweetController {
 
     @RequestMapping(value="tweets", params = "q", method = RequestMethod.GET)
     public Iterable<Tweet> getTweetsByWord(@RequestParam("q") String word){
-        System.out.println("getTweetsByWord: " + word);
-        return null;
+        return tweetRepository.findByWordInText(word);
     }
 
     @RequestMapping(value="hashtags", params = "q", method = RequestMethod.GET)
     public Iterable<Tweet> getTweetsByHashtag(@RequestParam("q") String hashTag){
-        System.out.println("getTweetsByHashtag: "+hashTag);
-        return null;
+        return tweetRepository.findByHashTag(hashTag);
     }
 
     @RequestMapping(value="user", params = "q", method = RequestMethod.GET)
     public Iterable<Tweet> getTweetsByUser(@RequestParam("q") String user){
-        tweetRepository.findByUser(user);
-        return null;
+         return tweetRepository.findByUser(user);
+    }
+
+    @RequestMapping(value = "links", params = "q", method = RequestMethod.GET)
+    public Iterable<Tweet> getTweetsByLink(@RequestParam("q") String link){
+        return tweetRepository.findByLink(link);
     }
 
     @RequestMapping(value="near", params = {"lat","lon","radius"}, method = RequestMethod.GET)

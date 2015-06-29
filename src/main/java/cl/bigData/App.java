@@ -41,10 +41,10 @@ public class App
 
     /* It use a single node client to connect to elasticsearch, instead os the transport client
     * */
-    @Bean
+  /*  @Bean
     public ElasticsearchOperations elasticsearchTemplate() {
         Client client = NodeBuilder.nodeBuilder().local(true).node().client();
         return new ElasticsearchTemplate(client);
-    }
+    }*/
 
 }
