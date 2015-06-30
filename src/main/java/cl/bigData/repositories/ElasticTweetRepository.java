@@ -28,7 +28,7 @@ import static org.elasticsearch.index.query.QueryBuilders.*;
 @Repository
 public class ElasticTweetRepository implements TweetRepository {
 
-    private static final String INDEX = "twitter2"; //me genera problemas con los fields nesteds en "tweet"
+    private static final String INDEX = "twitter"; //me genera problemas con los fields nesteds en "tweet"
     private static final String TYPE = "tweet";
 
 
