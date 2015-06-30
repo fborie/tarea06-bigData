@@ -20,11 +20,6 @@ import java.util.List;
 import static org.elasticsearch.index.query.FilterBuilders.*;
 import static org.elasticsearch.index.query.QueryBuilders.*;
 
-
-/**
- * Created by fjborie on 24-06-15.
- */
-
 @Repository
 public class ElasticTweetRepository implements TweetRepository {
 
@@ -36,7 +31,7 @@ public class ElasticTweetRepository implements TweetRepository {
 
     @PostConstruct
     public void setup(){
-        client = NodeBuilder.nodeBuilder().node().client();
+        client = NodeBuilder.nodeBuilder().clusterName("twitter-cluster").node().client();
     }
 
     @PreDestroy
