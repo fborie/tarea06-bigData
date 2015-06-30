@@ -4,6 +4,11 @@ import cl.bigData.Entities.Tweet;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.common.settings.ImmutableSettings;
+import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.common.transport.InetSocketTransportAddress;
+import org.elasticsearch.common.transport.TransportAddress;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.node.NodeBuilder;
@@ -27,16 +32,25 @@ public class ElasticTweetRepository implements TweetRepository {
     private static final String TYPE = "tweet";
 
 
-    private Client client;
+    private Client m_client;
 
     @PostConstruct
     public void setup(){
-        client = NodeBuilder.nodeBuilder().clusterName("twitter-cluster").node().client();
+        // added: create an elasticSearch Transport Client 
+        // to comunicate with the cluster to store the json objects
+        Settings settings = ImmutableSettings.settingsBuilder()
+                                .put("cluster.name", "twitter-cluster").build();
+
+        TransportAddress address = new InetSocketTransportAddress("localhost", 9301);
+        m_client = new TransportClient(settings)
+                                .addTransportAddress(address);
+
+        //m_client = NodeBuilder.nodeBuilder().clusterName("twitter-cluster").node().client();
     }
 
     @PreDestroy
     public void tearDown(){
-        client.close();
+        m_client.close();
     }
 
     @Override
@@ -88,7 +102,7 @@ public class ElasticTweetRepository implements TweetRepository {
     }
 
     private SearchResponse getSearchResponse(QueryBuilder qb){
-        return client.prepareSearch(INDEX).setTypes(TYPE)
+        return m_client.prepareSearch(INDEX).setTypes(TYPE)
                 .addFields("user", "text", "links", "location", "created_at", "hashtags")
                 .setQuery(qb).setSize(50).execute().actionGet();
     }

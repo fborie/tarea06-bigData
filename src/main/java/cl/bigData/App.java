@@ -14,10 +14,6 @@ import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 
-/**
- * Hello world!
- *
- */
 
 @Configuration
 @ComponentScan(basePackages = "cl.bigData")
