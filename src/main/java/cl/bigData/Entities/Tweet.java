@@ -12,7 +12,7 @@ public class Tweet {
     private String status;
 
     @JsonProperty
-    private ArrayList<String> hashTags;
+    private ArrayList<String> hashtags;
 
     @JsonProperty
     private ArrayList<String> links;
@@ -30,7 +30,7 @@ public class Tweet {
     public Tweet(@JsonProperty("status") String status, @JsonProperty("hashtags") ArrayList<String> hashTags, @JsonProperty("links") ArrayList<String> links,
                  @JsonProperty("user") String user, @JsonProperty("createdAt") long createdAt, @JsonProperty("location") GeoPoint location){
         this.status = status;
-        this.hashTags = hashTags;
+        this.hashtags = hashTags;
         this.links = links;
         this.user = user;
         this.createdAt = createdAt;
