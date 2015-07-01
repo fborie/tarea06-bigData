@@ -82,6 +82,7 @@ public class ElasticTweetRepository implements TweetRepository {
         System.out.println(response.getHits().getHits().length);
 
         return extractTweetsFromHits(response.getHits().getHits());
+
     }
 
     @Override
@@ -114,7 +115,7 @@ public class ElasticTweetRepository implements TweetRepository {
 
     private SearchResponse getSearchResponse(QueryBuilder qb){
         return m_client.prepareSearch(INDEX).setTypes(TYPE)
-                .addFields("user", "status", "links", "location", "createdAt", "hashtags")
+                .addFields("user", "status", "links", "location.lat", "location.lon", "createdAt", "hashtags")
                 .setQuery(qb).setSize(1000).execute().actionGet();
     }
 
@@ -140,7 +141,7 @@ public class ElasticTweetRepository implements TweetRepository {
             hashTags = extractListFromField(hit.field("hashtags").getValues());
 
         GeoPoint location = new GeoPoint(0, 0);
-        System.out.println(hit.field("location"));
+        System.out.println(hit.field("location.lat"));
         if (hit.field("location") != null)
             location = hit.field("location").getValue();
 
