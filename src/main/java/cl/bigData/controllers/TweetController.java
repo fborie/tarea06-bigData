@@ -38,9 +38,8 @@ public class TweetController {
     }
 
     @RequestMapping(value="near", params = {"lat","lon","radius"}, method = RequestMethod.GET)
-    public Iterable<Tweet> getTweetsByLocation(@RequestParam("lat") double lat, @RequestParam("lon") double lon, @RequestParam("radius") double radius){
-        System.out.println("getTweetsByLocation: "+String.valueOf(lat)+"-"+String.valueOf(lon)+"-"+String.valueOf(radius));
-        return null;
+    public Iterable<Tweet> getTweetsByLocation(@RequestParam("lat") double lat, @RequestParam("lon") double lon, @RequestParam("radius") int radius){
+        return tweetRepository.findByLocation(lat, lon, radius);
     }
 
 }
