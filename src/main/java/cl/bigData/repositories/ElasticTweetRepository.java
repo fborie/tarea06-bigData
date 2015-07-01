@@ -75,7 +75,7 @@ public class ElasticTweetRepository implements TweetRepository {
         SearchRequest request =
                 Requests.searchRequest("twitter")
                         .types("tweet")
-                        .source("{ \"fields\" : [\"user\", \"status\", \"links\", \"location\", \"createdAt\", \"hashtags\"],"
+                        .source("{ \"fields\" : [\"user\", \"status\", \"links\", \"location.lat\", \"location.lon\",\"createdAt\", \"hashtags\"],"
                                 + "\"query\":{\"match\":{\"user\":\"" + user + "\"}}}");
         SearchResponse response = m_client.search(request).actionGet();
 
@@ -140,11 +140,7 @@ public class ElasticTweetRepository implements TweetRepository {
         if (hit.field("hashtags") != null)
             hashTags = extractListFromField(hit.field("hashtags").getValues());
 
-        GeoPoint location = new GeoPoint(100, 100);
-        System.out.println("Lat");
-        System.out.println(hit.field("location.lat").getValue());
-        System.out.println("Lon");
-        System.out.println(hit.field("location.lon").getValue());
+        GeoPoint location = new GeoPoint(0, 0);
         if (hit.field("location.lat") != null && hit.field("location.lon") != null)
             location = extractPositionsFromLocation(hit);
 
