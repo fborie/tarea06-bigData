@@ -102,7 +102,7 @@ public class ElasticTweetRepository implements TweetRepository {
     private SearchResponse getSearchResponse(QueryBuilder qb){
         return m_client.prepareSearch(INDEX).setTypes(TYPE)
                 .addFields("user", "status", "links", "location.lat", "location.lon", "createdAt", "hashtags")
-                .setQuery(qb).setSize(50).execute().actionGet();
+                .setQuery(qb).setSize(1000).execute().actionGet();
     }
 
     private ArrayList<Tweet> extractTweetsFromHits(SearchHit[] hits){
