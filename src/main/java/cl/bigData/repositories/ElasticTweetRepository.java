@@ -75,7 +75,7 @@ public class ElasticTweetRepository implements TweetRepository {
         SearchRequest request =
                 Requests.searchRequest("twitter")
                         .types("tweet")
-                        .source("{ \"fields\" : \"[\"user\", \"status\", \"links\", \"location\", \"createdAt\", \"hashtags\"],"
+                        .source("{ \"fields\" : [\"user\", \"status\", \"links\", \"location\", \"createdAt\", \"hashtags\"],"
                                 + "\"query\":{\"match\":{\"user\":\"" + user + "\"}}}");
         SearchResponse response = m_client.search(request).actionGet();
 
