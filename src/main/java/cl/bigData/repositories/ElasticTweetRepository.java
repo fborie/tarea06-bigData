@@ -73,7 +73,7 @@ public class ElasticTweetRepository implements TweetRepository {
 
     @Override
     public Iterable<Tweet> findByWordInText(String word) {
-        QueryBuilder qb = matchQuery("text", word);
+        QueryBuilder qb = matchQuery("status", word);
         SearchResponse response = getSearchResponse(qb);
         System.out.println(response.getHits().getHits().length);
 
@@ -86,7 +86,6 @@ public class ElasticTweetRepository implements TweetRepository {
         SearchResponse response = getSearchResponse(qb);
         return extractTweetsFromHits(response.getHits().getHits());
     }
-
 
     @Override
     public Iterable<Tweet> findByLink(String link) {
@@ -102,7 +101,7 @@ public class ElasticTweetRepository implements TweetRepository {
 
     private SearchResponse getSearchResponse(QueryBuilder qb){
         return m_client.prepareSearch(INDEX).setTypes(TYPE)
-                .addFields("user", "text", "links", "location.lat", "location.lon", "created_at", "hashtags")
+                .addFields("user", "status", "links", "location.lat", "location.lon", "created_at", "hashtags")
                 .setQuery(qb).setSize(50).execute().actionGet();
     }
 
@@ -116,7 +115,7 @@ public class ElasticTweetRepository implements TweetRepository {
 
     private Tweet extractTweetFromHit(SearchHit hit){
         String user = hit.field("user").getValue();
-        String status = hit.field("text").getValue();
+        String status = hit.field("status").getValue();
         String createdAt = hit.field("createdAt").getValue();
         ArrayList<String> links = extractListFromField(hit.field("links").getValues());
         ArrayList<String> hashTags = extractListFromField(hit.field("hashtags").getValues());
