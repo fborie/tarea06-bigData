@@ -116,7 +116,7 @@ public class ElasticTweetRepository implements TweetRepository {
     private Tweet extractTweetFromHit(SearchHit hit){
         String user = hit.field("user").getValue();
         String status = hit.field("status").getValue();
-        String createdAt = hit.field("createdAt").getValue();
+        long createdAt = hit.field("createdAt").getValue();
         ArrayList<String> links = extractListFromField(hit.field("links").getValues());
         ArrayList<String> hashTags = extractListFromField(hit.field("hashtags").getValues());
         Location location = extractLocation(hit);

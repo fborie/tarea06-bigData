@@ -20,14 +20,14 @@ public class Tweet {
     private String username;
 
     @JsonProperty
-    private String createdAt;
+    private long createdAt;
 
     @JsonProperty
     private Location location;
 
     @JsonCreator
     public Tweet(@JsonProperty("status") String status, @JsonProperty("hashtags") ArrayList<String> hashTags, @JsonProperty("links") ArrayList<String> links,
-                 @JsonProperty("user") String username, @JsonProperty("createdAt") String createdAt, @JsonProperty("location") Location location){
+                 @JsonProperty("user") String username, @JsonProperty("createdAt") long createdAt, @JsonProperty("location") Location location){
         this.status = status;
         this.hashTags = hashTags;
         this.links = links;
