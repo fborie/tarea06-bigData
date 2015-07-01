@@ -141,9 +141,8 @@ public class ElasticTweetRepository implements TweetRepository {
             hashTags = extractListFromField(hit.field("hashtags").getValues());
 
         GeoPoint location = new GeoPoint(0, 0);
-        System.out.println(hit.field("location.lat"));
-        if (hit.field("location") != null)
-            location = hit.field("location").getValue();
+        if (hit.field("location.lat") != null && hit.field("location.lon") != null)
+            extractPositionsFromLocation(hit);
 
         return new Tweet(status,hashTags,links,user,createdAt,location);
     }
@@ -154,6 +153,13 @@ public class ElasticTweetRepository implements TweetRepository {
             arr.add((String) obj);
         }
         return arr;
+    }
+
+    private GeoPoint extractPositionsFromLocation(SearchHit hit)
+    {
+        double latitude = hit.field("location.lat").getValue();
+        double longitude = hit.field("location.lon").getValue();
+        return new GeoPoint(latitude, longitude);
     }
 
 }
