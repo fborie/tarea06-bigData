@@ -38,11 +38,9 @@ public class ElasticTweetRepository implements TweetRepository {
     public void setup(){
         // added: create an elasticSearch Transport Client 
         // to comunicate with the cluster to store the json objects
-        Settings settings = ImmutableSettings.settingsBuilder()
-                                .put("cluster.name", "twitter-cluster").build();
 
-        TransportAddress address = new InetSocketTransportAddress("localhost", 9301);
-        m_client = new TransportClient(settings)
+        TransportAddress address = new InetSocketTransportAddress("localhost", 9300);
+        m_client = new TransportClient()
                                 .addTransportAddress(address);
 
         //m_client = NodeBuilder.nodeBuilder().clusterName("twitter-cluster").node().client();
