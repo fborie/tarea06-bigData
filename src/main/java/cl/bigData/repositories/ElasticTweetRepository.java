@@ -2,9 +2,12 @@ package cl.bigData.repositories;
 
 import cl.bigData.Entities.Location;
 import cl.bigData.Entities.Tweet;
+import org.elasticsearch.action.percolate.TransportShardMultiPercolateAction;
+import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.client.Requests;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.geo.GeoPoint;
 import org.elasticsearch.common.settings.ImmutableSettings;
@@ -55,8 +58,8 @@ public class ElasticTweetRepository implements TweetRepository {
 
     @Override
     public Iterable<Tweet> findByUser(String user) {
-        ArrayList<Tweet> tweets = new ArrayList<Tweet>();
-        QueryBuilder qb = termQuery("user", user);
+        //--ArrayList<Tweet> tweets = new ArrayList<Tweet>();
+        //--QueryBuilder qb = termQuery("user", user);
 
         //NO SE PORQUE NO FUNCIONA LA BUSQUEDA CON SCROLL
        /* SearchResponse scrollResp = client.prepareSearch(INDEX).setTypes(TYPE).addField("user").setSearchType(SearchType.SCAN)
@@ -66,7 +69,14 @@ public class ElasticTweetRepository implements TweetRepository {
         for (SearchHit hit : scrollResp.getHits().getHits()) {
             tweets.add(extractTweetFromHit(hit));
         }*/
-        SearchResponse response = getSearchResponse(qb);
+        //--SearchResponse response = getSearchResponse(qb);
+
+        SearchRequest request =
+                Requests.searchRequest("twitter")
+                        .types("tweet")
+                        .source("{\"query\":{\"match\":{\"user\":\"" + user + "\"}}}");
+        SearchResponse response = m_client.search(request).actionGet();
+
         System.out.println(response.getHits().getHits().length);
 
         return extractTweetsFromHits(response.getHits().getHits());
