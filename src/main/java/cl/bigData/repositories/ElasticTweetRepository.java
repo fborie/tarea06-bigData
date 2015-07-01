@@ -128,6 +128,7 @@ public class ElasticTweetRepository implements TweetRepository {
             hashTags = extractListFromField(hit.field("hashtags").getValues());
 
         GeoPoint location = new GeoPoint(0, 0);
+        System.out.println(hit.field("location"));
         if (hit.field("location") != null)
             location = hit.field("location").getValue();
 
