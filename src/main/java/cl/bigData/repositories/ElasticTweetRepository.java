@@ -146,7 +146,7 @@ public class ElasticTweetRepository implements TweetRepository {
         System.out.println("Lon");
         System.out.println(hit.field("location.lon").getValue());
         if (hit.field("location.lat") != null && hit.field("location.lon") != null)
-            extractPositionsFromLocation(hit);
+            location = extractPositionsFromLocation(hit);
 
         return new Tweet(status,hashTags,links,user,createdAt,location);
     }
