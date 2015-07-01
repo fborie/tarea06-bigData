@@ -1,15 +1,9 @@
 package cl.bigData.repositories;
 
-import cl.bigData.Entities.Location;
 import cl.bigData.Entities.Tweet;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.common.settings.ImmutableSettings;
-import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.transport.InetSocketTransportAddress;
-import org.elasticsearch.common.transport.TransportAddress;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.node.NodeBuilder;
@@ -39,12 +33,14 @@ public class ElasticTweetRepository implements TweetRepository {
     public void setup(){
         // added: create an elasticSearch Transport Client 
         // to comunicate with the cluster to store the json objects
+        Settings settings = ImmutableSettings.settingsBuilder()
+                                .put("cluster.name", "twitter-cluster").build();
 
-        TransportAddress address = new InetSocketTransportAddress("localhost", 9300);
-        m_client = new TransportClient()
+        TransportAddress address = new InetSocketTransportAddress("localhost", 9301);
+        m_client = new TransportClient(settings)
                                 .addTransportAddress(address);
 
-        //m_client = NodeBuilder.nodeBuilder().clusterName("twitter-cluster").node().client();
+        m_client = NodeBuilder.nodeBuilder().clusterName("twitter-cluster").node().client();
     }
 
     @PreDestroy
@@ -101,7 +97,7 @@ public class ElasticTweetRepository implements TweetRepository {
     }
 
     private SearchResponse getSearchResponse(QueryBuilder qb){
-        return m_client.prepareSearch(INDEX).setTypes(TYPE)
+        return client.prepareSearch(INDEX).setTypes(TYPE)
                 .addFields("user", "text", "links", "location", "created_at", "hashtags")
                 .setQuery(qb).setSize(50).execute().actionGet();
     }
@@ -116,12 +112,12 @@ public class ElasticTweetRepository implements TweetRepository {
 
     private Tweet extractTweetFromHit(SearchHit hit){
         String user = hit.field("user").getValue();
-        String status = hit.field("text").getValue();
-        String createdAt = hit.field("createdAt").getValue();
+        String text = hit.field("text").getValue();
+        String createdAt = hit.field("created_at").getValue();
         ArrayList<String> links = extractListFromField(hit.field("links").getValues());
         ArrayList<String> hashTags = extractListFromField(hit.field("hashtags").getValues());
-        Location location = extractLocation(hit);
-        return new Tweet(status,hashTags,links,user,createdAt,location);
+        Double[] location = extractLocation(hit.field("location").getValues());
+        return new Tweet(text,hashTags,links,user,createdAt,location);
     }
 
     private ArrayList<String> extractListFromField(List<Object> objects){
@@ -132,9 +128,10 @@ public class ElasticTweetRepository implements TweetRepository {
         return arr;
     }
 
-    private Location extractLocation(SearchHit hit){
-        double lat = hit.field("location.lat").getValue();
-        double lon = hit.field("location.lon").getValue();
-        return new Location(lat, lon);
+    private Double[] extractLocation(List<Object> location){
+        Double[] loc = new Double[2];
+        loc[0] =(Double) location.get(0);
+        loc[1] = (Double) location.get(1);
+        return loc;
     }
 }

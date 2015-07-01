@@ -10,10 +10,6 @@ import cl.bigData.repositories.TweetRepository;
 
 import java.util.ArrayList;
 
-/**
- * Created by fjborie on 17-06-15.
- */
-
 @RequestMapping("/")
 @RestController
 public class TweetController {

@@ -8,7 +8,7 @@ import java.util.ArrayList;
 public class Tweet {
 
     @JsonProperty
-    private String text;
+    private String status;
 
     @JsonProperty
     private ArrayList<String> hashTags;
@@ -26,9 +26,9 @@ public class Tweet {
     private Location location;
 
     @JsonCreator
-    public Tweet(@JsonProperty("text") String text, @JsonProperty("hashtags") ArrayList<String> hashTags, @JsonProperty("links") ArrayList<String> links,
+    public Tweet(@JsonProperty("status") String status, @JsonProperty("hashtags") ArrayList<String> hashTags, @JsonProperty("links") ArrayList<String> links,
                  @JsonProperty("user") String username, @JsonProperty("createdAt") String createdAt, @JsonProperty("location") Location location){
-        this.text = text;
+        this.status = status;
         this.hashTags = hashTags;
         this.links = links;
         this.username = username;
