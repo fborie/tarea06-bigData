@@ -109,8 +109,21 @@ public class ElasticTweetRepository implements TweetRepository {
     }
 
     @Override
-    public Iterable<Tweet> findByLocation(float lat, float lon, float radius) {
-        return null;
+    public Iterable<Tweet> findByLocation(double lat, double lon, int radiusInKm) {
+
+        SearchRequest request =
+                Requests.searchRequest("twitter")
+                        .types("tweet")
+                        .source("{ \"fields\" : [\"user\", \"status\", \"links\", \"location.lat\", \"location.lon\",\"createdAt\", \"hashtags\"],"
+                                + "\"query\":{\"filtered\":{\"filter\":{\"geo_distance\":{\"distance\": \"" +radiusInKm+"km\"," +
+                                "\"location\":{\"properties\":{\"lat\": " + lat + ", \"lon\": " + lon + "}}}}}}");
+
+        SearchResponse response = m_client.search(request).actionGet();
+
+        System.out.println(response.getHits().getHits().length);
+
+        return extractTweetsFromHits(response.getHits().getHits());
+
     }
 
     private SearchResponse getSearchResponse(QueryBuilder qb){
