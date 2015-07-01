@@ -119,11 +119,11 @@ public class ElasticTweetRepository implements TweetRepository {
         long createdAt = hit.field("createdAt").getValue();
 
         ArrayList<String> links = new ArrayList<String>();
-        if (extractListFromField(hit.field("links").getValues()) != null)
+        if (hit.field("links").getValues() != null)
             links = extractListFromField(hit.field("links").getValues());
 
         ArrayList<String> hashTags = new ArrayList<String>();
-        if (extractListFromField(hit.field("hashtags").getValues()) != null)
+        if (hit.field("hashtags").getValues() != null)
             hashTags = extractListFromField(hit.field("hashtags").getValues());
 
         Location location = new Location(0, 0);
