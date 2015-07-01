@@ -2,6 +2,7 @@ package cl.bigData.Entities;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.elasticsearch.common.geo.GeoPoint;
 
 import java.util.ArrayList;
 
@@ -23,11 +24,11 @@ public class Tweet {
     private long createdAt;
 
     @JsonProperty
-    private Location location;
+    private GeoPoint location;
 
     @JsonCreator
     public Tweet(@JsonProperty("status") String status, @JsonProperty("hashtags") ArrayList<String> hashTags, @JsonProperty("links") ArrayList<String> links,
-                 @JsonProperty("user") String user, @JsonProperty("createdAt") long createdAt, @JsonProperty("location") Location location){
+                 @JsonProperty("user") String user, @JsonProperty("createdAt") long createdAt, @JsonProperty("location") GeoPoint location){
         this.status = status;
         this.hashTags = hashTags;
         this.links = links;

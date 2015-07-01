@@ -6,6 +6,7 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.common.geo.GeoPoint;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
@@ -101,7 +102,7 @@ public class ElasticTweetRepository implements TweetRepository {
 
     private SearchResponse getSearchResponse(QueryBuilder qb){
         return m_client.prepareSearch(INDEX).setTypes(TYPE)
-                .addFields("user", "status", "links", "location.lat", "location.lon", "createdAt", "hashtags")
+                .addFields("user", "status", "links", "location", "createdAt", "hashtags")
                 .setQuery(qb).setSize(1000).execute().actionGet();
     }
 
@@ -126,9 +127,9 @@ public class ElasticTweetRepository implements TweetRepository {
         if (hit.field("hashtags") != null)
             hashTags = extractListFromField(hit.field("hashtags").getValues());
 
-        Location location = new Location(0, 0);
-        if (extractLocation(hit) != null)
-            location = extractLocation(hit);
+        GeoPoint location = new GeoPoint(0, 0);
+        if (hit.field("location") != null)
+            location = hit.field("location").getValue();
 
         return new Tweet(status,hashTags,links,user,createdAt,location);
     }
@@ -141,9 +142,4 @@ public class ElasticTweetRepository implements TweetRepository {
         return arr;
     }
 
-    private Location extractLocation(SearchHit hit){
-        double lat = hit.field("location.lat").getValue();
-        double lon = hit.field("location.lon").getValue();
-        return new Location(lat, lon);
-    }
 }
